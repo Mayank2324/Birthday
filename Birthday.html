@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Dancing+Script:wght@500;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     DESIGN TOKENS
+     ============================================================ */
+  :root{
+    --bg:            #FBF3F6;
+    --bg-soft:       #FFFDFC;
+    --ink:           #3A2A3E;
+    --ink-soft:      #6E5A6E;
+    --accent-plum:   #6B3F5C;
+    --accent-rose:   #cd345d;
+    --accent-gold:   #CE9A4E;
+    --accent-lav:    #A98FC9;
+    --line:          rgba(107,63,92,0.16);
+    --shadow:        0 20px 50px rgba(107,63,92,0.14);
+    --serif:         'Cormorant Garamond', serif;
+    --script:        'Dancing Script', cursive;
+    --body:          'Lora', serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); overflow-x:hidden; }
+  img{ max-width:100%; display:block; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  ::selection{ background:var(--accent-rose); color:#fff; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent-plum); outline-offset:3px; }
+
+  .eyebrow{ letter-spacing:.22em; text-transform:uppercase; font-size:.72rem; color:var(--accent-plum); font-weight:500; }
+  h1,h2,h3{ font-family:var(--serif); font-weight:500; margin:0; color:var(--ink); }
+  section{ position:relative; padding:120px 24px; max-width:1180px; margin:0 auto; }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto 64px; }
+  .section-head h2{ font-size:clamp(2rem, 4.4vw, 3.2rem); font-style:italic; margin-top:10px; }
+  .section-head p{ color:var(--ink-soft); margin-top:14px; font-size:1.02rem; }
+
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s ease, transform .9s ease; }
+  .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+  /* ============================================================
+     HERO SLIDER
+     ============================================================ */
+  .hero{
+    position:relative;
+    height:650px;
+    overflow:hidden;
+    max-width:none;
+    padding:0;
+}
+  
+.slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 1.4s ease;
+    background-size:65%;      /* Try 80%, 75%, etc. */
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color:#000;
+}
+
+  .slide.is-active{ opacity:1; z-index:1; }
+  .hero__scrim{
+    position:absolute; inset:0; z-index:2;
+    background:linear-gradient(180deg, rgba(58,42,62,.18) 0%, rgba(58,42,62,.32) 50%, rgba(58,42,62,.8) 100%);
+  }
+  #confetti-canvas{ position:fixed; inset:0; z-index:150; pointer-events:none; }
+
+  .hero__content{
+    position:relative; z-index:3; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    text-align:center; color:#fff; padding:0 24px 120px; height:650px;;
+  }
+  .hero__eyebrow{ font-family:var(--script); font-size:1.7rem; color:var(--accent-rose); margin-bottom:8px; opacity:0; animation:riseIn 1s .2s ease forwards; }
+  .hero h1{ color:#fff; font-size:clamp(2.6rem,8vw,6rem); font-style:italic; line-height:1; letter-spacing:-.01em; opacity:0; animation:riseIn 1s .45s ease forwards; }
+  .hero__sub{ margin-top:20px; max-width:520px; font-size:1.05rem; color:rgba(255,255,255,.88); opacity:0; animation:riseIn 1s .7s ease forwards; }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(18px);} to{ opacity:1; transform:translateY(0);} }
+
+  .slider-dots{ position:absolute; z-index:4; bottom:36px; left:50%; transform:translateX(-50%); display:flex; gap:10px; }
+  .slider-dots button{
+    width:9px; height:9px; border-radius:50%; border:1px solid rgba(255,255,255,.7);
+    background:transparent; cursor:pointer; padding:0; transition:background .3s ease, width .3s ease;
+  }
+  .slider-dots button.is-active{ background:#fff; width:24px; border-radius:6px; }
+
+  .slider-arrow{
+    position:absolute; z-index:4; top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.5); color:#fff;
+    width:46px; height:46px; border-radius:50%; cursor:pointer; font-size:1.1rem;
+    backdrop-filter:blur(4px);
+  }
+  .slider-arrow.prev{ left:24px; }
+  .slider-arrow.next{ right:24px; }
+
+  /* ============================================================
+     PULL QUOTE (full width, image backed)
+     ============================================================ */
+  .quote-banner{
+    max-width:none; padding:0; position:relative; min-height:60vh;
+    display:flex; align-items:center; justify-content:center;
+    background-size:cover; background-position:center;
+  }
+  .quote-banner::before{ content:''; position:absolute; inset:0; background:rgba(58,42,62,.62); }
+  .quote-banner blockquote{
+    position:relative; z-index:1; max-width:760px; text-align:center; color:#fff;
+    font-family:var(--serif); font-style:italic; font-size:clamp(1.6rem,3.6vw,2.6rem);
+    line-height:1.35; padding:0 30px; margin:0;
+  }
+  .quote-banner cite{ display:block; margin-top:22px; font-family:var(--script); font-style:normal; font-size:1.4rem; color:var(--accent-rose); }
+
+  /* ============================================================
+     GALLERY + inline quote cards
+     ============================================================ */
+  .gallery{ background:var(--bg); }
+  .masonry{
+    columns:4 220px;
+    column-gap:22px;
+  }
+  .masonry .item{
+    break-inside:avoid; margin-bottom:22px; border-radius:2px; overflow:hidden;
+    box-shadow:var(--shadow); position:relative; background:var(--bg-soft);
+  }
+  .masonry .item img{ width:100%; display:block; cursor:pointer; transition:transform .5s ease; }
+  .masonry .item:hover img{ transform:scale(1.04); }
+  .masonry .quote-card{
+    padding:30px 24px; display:flex; align-items:center; justify-content:center;
+    text-align:center; background:linear-gradient(160deg, #F3DEE8, #E7C9DB);
+    min-height:180px;
+  }
+  .masonry .quote-card p{ font-family:var(--script); font-size:1.5rem; color:var(--accent-plum); margin:0; line-height:1.4; }
+
+  .lightbox{
+    position:fixed; inset:0; z-index:120; background:rgba(58,42,62,.92);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .lightbox.is-open{ opacity:1; pointer-events:auto; }
+  .lightbox img{ max-width:min(80vw,700px); max-height:78vh; box-shadow:0 30px 80px rgba(0,0,0,.4); border:6px solid #fff; }
+  .lightbox__close{ position:absolute; top:26px; right:32px; background:none; border:1px solid rgba(255,255,255,.5); color:#fff; width:42px; height:42px; border-radius:50%; font-size:1.2rem; cursor:pointer; }
+
+  /* ============================================================
+     PORTRAIT + MESSAGE SPLIT
+     ============================================================ */
+  .portrait-split{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; background:var(--bg-soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line); max-width:none; }
+  .portrait-split__inner{ display:contents; }
+  .portrait-split img{ border-radius:2px; box-shadow:var(--shadow); }
+  .portrait-split .copy{ max-width:460px; }
+  .portrait-split .copy .eyebrow{ display:block; margin-bottom:14px; }
+  .portrait-split .copy h2{ font-size:clamp(1.8rem,3.6vw,2.6rem); font-style:italic; margin-bottom:18px; }
+  .portrait-split .copy p{ color:var(--ink-soft); line-height:1.75; font-size:1.02rem; }
+
+  /* ============================================================
+     WISH SECTION — signature interaction (confetti burst)
+     ============================================================ */
+  .wish{
+    max-width:none; padding:0; position:relative; min-height:70vh;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    background-size:cover; background-position:center;
+  }
+  .wish::before{ content:''; position:absolute; inset:0; background:rgba(58,42,62,.55); }
+  .wish__content{ position:relative; z-index:1; color:#fff; max-width:560px; padding:0 24px; }
+  .wish h2{ color:#fff; font-style:italic; font-size:clamp(2rem,4.4vw,3rem); }
+  .wish p{ margin-top:16px; color:rgba(255,255,255,.88); font-size:1.05rem; }
+  .wish-btn{
+    margin-top:34px; padding:16px 38px; border-radius:40px; border:1px solid rgba(255,255,255,.7);
+    background:rgba(255,255,255,.12); color:#fff; font-family:var(--body); font-size:.95rem;
+    letter-spacing:.05em; cursor:pointer; transition:background .3s ease, transform .3s ease;
+    backdrop-filter:blur(4px);
+  }
+  .wish-btn:hover{ background:rgba(255,255,255,.28); transform:translateY(-2px); }
+  .wish-revealed{
+    margin-top:26px; font-family:var(--script); font-size:1.6rem; color:var(--accent-rose);
+    opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s ease;
+  }
+  .wish-revealed.is-shown{ opacity:1; transform:translateY(0); }
+
+  /* ============================================================
+     STAT COUNTERS
+     ============================================================ */
+  .stats{ text-align:center; }
+  .stats__grid{ display:flex; justify-content:center; gap:60px; flex-wrap:wrap; margin-top:10px; }
+  .stat strong{ font-family:var(--serif); font-style:italic; font-size:clamp(2rem,5vw,3.4rem); color:var(--accent-plum); display:block; }
+  .stat span{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); }
+
+  footer{ text-align:center; padding:80px 24px 60px; color:var(--ink-soft); }
+  footer .script-line{ font-family:var(--script); font-size:2.2rem; color:var(--accent-plum); display:block; margin-bottom:14px; }
+  footer small{ font-size:.75rem; opacity:.7; }
+
+  @media (max-width: 900px){
+    .portrait-split{ grid-template-columns:1fr; padding:80px 24px; }
+    .masonry{ columns:2 180px; }
+  }
+  @media (max-width: 560px){
+    .masonry{ columns:2 140px; }
+    section{ padding:80px 20px; }
+    .slider-arrow{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ================= HERO SLIDER ================= -->
+  <section class="hero" id="hero">
+    <div class="slide is-active" style="background-image:url('images/hero-1.jpeg')"></div>
+    <div class="slide" style="background-image:url('images/hero-2.jpeg')"></div>
+    <div class="slide" style="background-image:url('images/hero-3.jpeg')"></div>
+    <div class="slide" style="background-image:url('images/hero-4.jpeg')"></div>
+    <div class="slide" style="background-image:url('images/hero-5.jpeg')"></div>
+    <div class="hero__scrim"></div>
+
+    <button class="slider-arrow prev" id="prevSlide" aria-label="Previous photo">‹</button>
+    <button class="slider-arrow next" id="nextSlide" aria-label="Next photo">›</button>
+
+    <div class="hero__content">
+      <span class="hero__eyebrow">happy birthday to</span>
+      <h1>Goluu</h1>
+      <p class="hero__sub">Happy Birthday Dikaa, God Bless you, be happy <br> Lot's of Love you Babe <br>The only thing that make me sad today is i am not beside you</p>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+  </section>
+
+  <!-- ================= QUOTE BANNER ================= -->
+  <section class="quote-banner" style="background-image:url('images/portrait.jpg')">
+    <blockquote>
+      "Happy Birthday to my Girl, my love, my everything. Missing you more this year Because i am not beside you this Birthday"
+      <cite>— you, mayuu</cite>
+    </blockquote>
+  </section>
+
+  <!-- ================= GALLERY WITH QUOTES ================= -->
+  <section class="gallery">
+    <div class="section-head reveal">
+      <span class="eyebrow">a years, in photos</span>
+      <h2>Moments Worth Keeping</h2>
+      <p>The only thing that makes me Happy ,our Memories</p>
+    </div>
+    <div class="masonry">
+      <figure class="item reveal"><img src="images/gallery-1.jpeg" alt="Memory photo 1" data-full="images/gallery-1.jpg"></figure>
+      <figure class="item reveal"><img src="images/gallery-2.jpeg" alt="Memory photo 2" data-full="images/gallery-2.jpg"></figure>
+      <div class="item quote-card reveal"><p>"Getting older on you looks really good."</p></div>
+      <figure class="item reveal"><img src="images/gallery-3.jpeg" alt="Memory photo 3" data-full="images/gallery-3.jpg"></figure>
+      <figure class="item reveal"><img src="images/gallery-4.jpeg" alt="Memory photo 4" data-full="images/gallery-4.jpg"></figure>
+      <figure class="item reveal"><img src="images/gallery-5.jpeg" alt="Memory photo 5" data-full="images/gallery-5.jpg"></figure>
+      <div class="item quote-card reveal"><p>"Still my favourite person to do nothing with."</p></div>
+      <figure class="item reveal"><img src="images/gallery-6.jpeg" alt="Memory photo 6" data-full="images/gallery-6.jpg"></figure>
+      <figure class="item reveal"><img src="images/gallery-7.jpeg" alt="Memory photo 7" data-full="images/gallery-7.jpg"></figure>
+      <div class="item quote-card reveal"><p>"Here's to another year of your terrible puns."</p></div>
+      <figure class="item reveal"><img src="images/gallery-8.jpeg" alt="Memory photo 8" data-full="images/gallery-8.jpg"></figure>
+    </div>
+  </section>
+
+
+
+
+<!-- ================= FROM THIS TO THIS ================= -->
+
+<style>
+.growth{
+    max-width:1180px;
+    margin:0 auto;
+    padding:120px 24px;
+    text-align:center;
+}
+
+.growth h2{
+    font-family:var(--serif);
+    font-size:clamp(2rem,4vw,3rem);
+    font-style:italic;
+    color:var(--ink);
+    margin:10px 0 15px;
+}
+
+.growth p{
+    max-width:700px;
+    margin:0 auto 60px;
+    color:var(--ink-soft);
+    line-height:1.8;
+}
+
+.growth-wrapper{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:40px;
+    align-items:center;
+}
+
+.growth-card{
+    background:#fff;
+    padding:20px;
+    border-radius:18px;
+    box-shadow:0 20px 50px rgba(107,63,92,.14);
+}
+
+.growth-card img{
+    width:100%;
+    height:450px;
+    object-fit:cover;
+    border-radius:12px;
+}
+
+.growth-card h3{
+    margin-top:20px;
+    font-family:var(--serif);
+    font-size:2rem;
+    color:var(--accent-plum);
+}
+
+.growth-card span{
+    display:block;
+    margin-top:8px;
+    color:var(--ink-soft);
+}
+
+.growth-arrow{
+    font-size:70px;
+    color:var(--accent-rose);
+}
+
+@media(max-width:900px){
+
+.growth{
+    padding:80px 20px;
+}
+
+.growth-wrapper{
+    grid-template-columns:1fr;
+}
+
+.growth-arrow{
+    transform:rotate(90deg);
+    font-size:50px;
+}
+
+.growth-card img{
+    height:320px;
+}
+
+}
+</style>
+
+<section class="growth reveal">
+
+    <div class="section-head">
+        <span class="eyebrow">A Beautiful Journey</span>
+
+        <h2>From This... To This ❤️</h2>
+
+        <p>
+            From a little girl with innocent dreams to the beautiful,
+            kind and amazing woman you are today. Watching your journey
+            is one of the most beautiful things, and I'm so grateful to
+            celebrate who you've become.
+        </p>
+    </div>
+
+    <div class="growth-wrapper">
+
+        <div class="growth-card">
+            <img src="images/childhood.jpeg" alt="Childhood Photo">
+
+            <h3>Then 🌸</h3>
+
+            <span>Little smiles, tiny dreams, endless innocence.</span>
+        </div>
+
+        <div class="growth-arrow">❤️ ➜</div>
+
+        <div class="growth-card">
+            <img src="images/today.jpeg" alt="Current Photo">
+
+            <h3>Now ✨</h3>
+
+            <span>Beautiful, confident, kind and still the same precious soul.</span>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+  <!-- ================= PORTRAIT + MESSAGE ================= -->
+  <section class="portrait-split">
+    <div class="portrait-split__inner">
+      <img src="images/portrait.jpeg" alt="Portrait photo" style="width:100%;height:100%;object-fit:cover;">
+      <div class="copy reveal">
+        <span class="eyebrow">a small note</span>
+        <h2>To the birthday girl</h2>
+        <p>Again Happy Birthday, Wishing this birthday may your best year yet! start your day with the Joy Smile and always be happy, the only thing that you miss this birthday is only me. </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STATS ================= -->
+  <section class="stats">
+    <div class="section-head reveal">
+      <span class="eyebrow">just for fun</span>
+      <h2>A Little Math On Us</h2>
+    </div>
+    <div class="stats__grid reveal">
+      <div class="stat"><strong id="stat-days">0</strong><span>days together</span></div>
+      <div class="stat"><strong>∞</strong><span>reasons why</span></div>
+      <div class="stat"><strong id="stat-cakes">0</strong><span>birthdays celebrated together</span></div>
+    </div>
+  </section>
+
+  <!-- ================= MAKE A WISH (signature interaction) ================= -->
+  <section class="wish" style="background-image:url('images/wish-bg.jpg')">
+    <div class="wish__content">
+      <span class="eyebrow" style="color:var(--accent-rose);">before you blow out the candles</span>
+      <h2>Make a wish</h2>
+      <p>Whatever it is — I hope it comes true. And if it involves me, even better.</p>
+      <button class="wish-btn" id="wishBtn">🎂 Make a wish</button>
+      <div class="wish-revealed" id="wishRevealed">Happy birthday, my love. I love you more this year than last.</div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox__close" id="lightboxClose" aria-label="Close photo">✕</button>
+    <img id="lightboxImg" src="" alt="Enlarged memory">
+  </div>
+
+  <footer>
+    <span class="script-line">Happy birthday, always.</span>
+    <small>Made with love — <code></code> My Birthday Girl be Happy always</small>
+  </footer>
+
+<script>
+  /* ---------------- scroll reveal ---------------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, { threshold:0.15 });
+  revealEls.forEach(el=>io.observe(el));
+
+  /* ---------------- hero slider ---------------- */
+  const slides = document.querySelectorAll('.slide');
+  const dotsWrap = document.getElementById('sliderDots');
+  let current = 0;
+  let sliderTimer;
+
+  slides.forEach((_, i)=>{
+    const dot = document.createElement('button');
+    dot.setAttribute('aria-label', 'Go to slide ' + (i+1));
+    if(i===0) dot.classList.add('is-active');
+    dot.addEventListener('click', ()=>goToSlide(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = dotsWrap.querySelectorAll('button');
+
+  function goToSlide(i){
+    slides[current].classList.remove('is-active');
+    dots[current].classList.remove('is-active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('is-active');
+    dots[current].classList.add('is-active');
+  }
+  function nextSlide(){ goToSlide(current+1); }
+  function prevSlide(){ goToSlide(current-1); }
+
+  function startAutoplay(){ sliderTimer = setInterval(nextSlide, 4500); }
+  function resetAutoplay(){ clearInterval(sliderTimer); startAutoplay(); }
+
+  document.getElementById('nextSlide').addEventListener('click', ()=>{ nextSlide(); resetAutoplay(); });
+  document.getElementById('prevSlide').addEventListener('click', ()=>{ prevSlide(); resetAutoplay(); });
+  startAutoplay();
+
+  /* ---------------- lightbox ---------------- */
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  document.querySelectorAll('.masonry img').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      lightboxImg.src = img.dataset.full || img.src;
+      lightbox.classList.add('is-open');
+    });
+  });
+  document.getElementById('lightboxClose').addEventListener('click', ()=>lightbox.classList.remove('is-open'));
+  lightbox.addEventListener('click', (e)=>{ if(e.target===lightbox) lightbox.classList.remove('is-open'); });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') lightbox.classList.remove('is-open'); });
+
+  /* ---------------- stat counters ---------------- */
+  // EDIT: set the date you got together to make "days together" count up automatically
+  // Fixed values
+animateNumber('stat-days', 1042);
+animateNumber('stat-cakes', 2); // Number of birthdays celebrated together
+
+function animateNumber(id, target){
+  const el = document.getElementById(id);
+  let start = null;
+  const duration = 1400;
+
+  function step(ts){
+    if(!start) start = ts;
+
+    const progress = Math.min((ts - start) / duration, 1);
+    el.textContent = Math.floor(progress * target);
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = target;
+    }
+  }
+
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        requestAnimationFrame(step);
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+
+  obs.observe(el);
+}
+
+  /* ---------------- confetti (make a wish) ---------------- */
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let confetti = [];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  const confettiColors = ['#E0879E','#CE9A4E','#A98FC9','#F3DEE8','#6B3F5C'];
+
+  function burstConfetti(){
+    if(reduceMotion) return;
+    for(let i=0;i<140;i++){
+      confetti.push({
+        x: canvas.width/2 + (Math.random()-0.5)*120,
+        y: canvas.height*0.6,
+        vx: (Math.random()-0.5)*11,
+        vy: -Math.random()*13 - 5,
+        size: 5 + Math.random()*6,
+        color: confettiColors[Math.floor(Math.random()*confettiColors.length)],
+        rot: Math.random()*Math.PI*2,
+        vr: (Math.random()-0.5)*0.3,
+        life: 0
+      });
+    }
+    requestAnimationFrame(renderConfetti);
+  }
+
+  function renderConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach(p=>{
+      p.vy += 0.32; // gravity
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, 1 - p.life/140);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2, -p.size/2*0.6, p.size, p.size*0.6);
+      ctx.restore();
+    });
+    confetti = confetti.filter(p=>p.life < 140);
+    if(confetti.length > 0) requestAnimationFrame(renderConfetti);
+  }
+
+  document.getElementById('wishBtn').addEventListener('click', ()=>{
+    burstConfetti();
+    document.getElementById('wishRevealed').classList.add('is-shown');
+  });
+</script>
+</body>
+</html>
